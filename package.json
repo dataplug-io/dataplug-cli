@@ -1,0 +1,38 @@
+{
+  "name": "@dataplug/dataplug-cli",
+  "version": "0.1.0",
+  "description": "Dataplug CLI library (by Dataplug.io)",
+  "main": "lib/index.js",
+  "bin": {
+    "dataplug-cli": "bin/dataplug-cli.js"
+  },
+  "scripts": {
+    "jsdoc": "jsdoc --destination ./docs --recurse ./lib --verbose",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+    "node": "8.x"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dataplug-io/dataplug-cli.git"
+  },
+  "author": "",
+  "license": "AGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/dataplug-io/dataplug-cli/issues"
+  },
+  "homepage": "https://github.com/dataplug-io/dataplug-cli#readme",
+  "dependencies": {
+    "@dataplug/dataplug": "^0.1.0",
+    "ajv": "^5.2.3",
+    "chalk": "^2.1.0",
+    "lodash": "^4.17.4",
+    "yargs": "^9.0.1"
+  },
+  "devDependencies": {
+    "jsdoc": "^3.5.5",
+    "mocha": "^4.0.1",
+    "standard": "^10.0.3"
+  }
+}
