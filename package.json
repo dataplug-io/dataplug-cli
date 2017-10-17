@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/dataplug-io/dataplug-cli#readme",
   "dependencies": {
-    "@dataplug/dataplug": "^0.1.0",
+    "@dataplug/dataplug": "^0.2.0",
     "ajv": "^5.2.3",
     "chalk": "^2.1.0",
     "lodash": "^4.17.4",

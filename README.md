@@ -1,4 +1,4 @@
-# Dataplug library by [Dataplug.io](https://dataplug.io)
+# Dataplug CLI library by [Dataplug.io](https://dataplug.io)
 
 [![Build Status][travis-image]][travis-url]
 [![Coverage Status][coveralls-image]][coveralls-url]
