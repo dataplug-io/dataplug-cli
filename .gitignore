@@ -1,10 +1,7 @@
+## Project-specific
 # Generated JSDoc
 #TODO: use orphan gh-pages branch to publish docs
 docs
-
-## Origin: https://github.com/github/gitignore/blob/master/AppEngine.gitignore
-# Google App Engine generated folder
-appengine-generated/
 
 ## Origin: https://github.com/github/gitignore/blob/master/Node.gitignore
 # Logs
