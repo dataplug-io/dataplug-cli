@@ -2,10 +2,19 @@
 
 const path = require('path');
 
-let collectionDir = process.env.DATAPLUG_COLLECTIONS_DIR || '';
-if (!path.isAbsolute(collectionDir)) {
-  collectionsDir = path.join(process.cwd(), collectionDir);
-}
+let collectionsFactory = process.env.DATAPLUG_COLLECTIONS_FACTORY;
+let collectionsDir = process.env.DATAPLUG_COLLECTIONS_DIR || '';
 
-require('../lib')(collectionsDir)
-  .argv;
+if (collectionsFactory) {
+  require('../lib')
+    .fromFactory(require(path.join(process.cwd(), collectionsFactory)))
+    .argv;
+} else {
+  if (!path.isAbsolute(collectionsDir)) {
+    collectionsDir = path.join(process.cwd(), collectionsDir);
+  }
+
+  require('../lib')
+    .fromDir(collectionsDir)
+    .argv;
+}
