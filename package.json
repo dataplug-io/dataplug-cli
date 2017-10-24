@@ -1,6 +1,6 @@
 {
   "name": "@dataplug/dataplug-cli",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "Dataplug CLI library (by Dataplug.io)",
   "main": "lib/index.js",
   "bin": {
