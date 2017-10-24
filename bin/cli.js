@@ -1,20 +1,22 @@
 #!/usr/bin/env node
 
-const path = require('path');
+const path = require('path')
+const cli = require('../lib')
 
-let collectionsFactory = process.env.DATAPLUG_COLLECTIONS_FACTORY;
-let collectionsDir = process.env.DATAPLUG_COLLECTIONS_DIR || '';
+let collectionsFactory = process.env.DATAPLUG_COLLECTIONS_FACTORY
+let collectionsDir = process.env.DATAPLUG_COLLECTIONS_DIR || ''
 
+let builder = cli.build()
 if (collectionsFactory) {
-  require('../lib')
-    .fromFactory(require(path.join(process.cwd(), collectionsFactory)))
-    .argv;
+  builder = builder
+    .usingCollectionFactory(require(path.join(process.cwd(), collectionsFactory)))
 } else {
   if (!path.isAbsolute(collectionsDir)) {
-    collectionsDir = path.join(process.cwd(), collectionsDir);
+    collectionsDir = path.join(process.cwd(), collectionsDir)
   }
 
-  require('../lib')
-    .fromDir(collectionsDir)
-    .argv;
+  builder = builder
+    .usingCollectionsFromDir(collectionsDir)
 }
+
+builder.process()
