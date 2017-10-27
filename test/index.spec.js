@@ -29,6 +29,12 @@ describe('dataplug-cli', () => {
       .that.is.an('function')
   })
 
+  it('has "filterStream" function', () => {
+    dataplugCli
+      .should.have.property('filterStream')
+      .that.is.an('function')
+  })
+
   it('has "streamSource" function', () => {
     dataplugCli
       .should.have.property('streamSource')
