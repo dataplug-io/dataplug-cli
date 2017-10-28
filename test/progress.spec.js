@@ -60,4 +60,13 @@ describe('Progress', () => {
         .should.be.equal('\u001b[2Kmetric = 0\n')
     })
   })
+
+  describe('#getMetrics()', () => {
+    it('returns metrics', () => {
+      const progress = new Progress()
+      progress.metric = 0
+      progress.getMetrics()
+        .should.have.property('metric', 0)
+    })
+  })
 })
