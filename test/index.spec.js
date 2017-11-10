@@ -28,22 +28,4 @@ describe('dataplug-cli', () => {
       .should.have.property('Progress')
       .that.is.an('function')
   })
-
-  it('has "filterStream" function', () => {
-    dataplugCli
-      .should.have.property('filterStream')
-      .that.is.an('function')
-  })
-
-  it('has "streamSource" function', () => {
-    dataplugCli
-      .should.have.property('streamSource')
-      .that.is.an('function')
-  })
-
-  it('has "streamTarget" function', () => {
-    dataplugCli
-      .should.have.property('streamTarget')
-      .that.is.an('function')
-  })
 })
