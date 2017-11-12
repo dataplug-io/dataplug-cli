@@ -17,6 +17,12 @@ describe('dataplug-cli', () => {
     })
   })
 
+  it('has "logger" field', () => {
+    dataplugCli
+      .should.have.property('logger')
+      .that.is.an('object')
+  })
+
   it('has "Builder" class', () => {
     dataplugCli
       .should.have.property('Builder')
