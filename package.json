@@ -29,8 +29,8 @@
   },
   "homepage": "https://github.com/dataplug-io/dataplug-cli#readme",
   "dependencies": {
-    "@dataplug/dataplug": "^0.40.0",
-    "@dataplug/dataplug-flatters": "^0.7.0",
+    "@dataplug/dataplug": "^0.41.0",
+    "@dataplug/dataplug-flatters": "^0.8.0",
     "@dataplug/dataplug-json": "^0.11.0",
     "ajv": "^5.3.0",
     "bluebird": "^3.5.1",
