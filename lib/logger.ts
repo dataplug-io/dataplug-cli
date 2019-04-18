@@ -1,5 +1,5 @@
-const _ = require('lodash')
-const winston = require('winston')
+import _ from 'lodash'
+import winston from 'winston'
 
 winston.configure({
   transports: [
@@ -9,4 +9,4 @@ winston.configure({
   ]
 })
 
-module.exports = winston
+export default winston

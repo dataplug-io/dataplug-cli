@@ -1,20 +1,26 @@
-const _ = require('lodash')
-const check = require('check-types')
-const path = require('path')
-const requireDirectory = require('require-directory')
-const yargs = require('yargs/yargs')
+import _ from 'lodash'
+import path from 'path'
+import requireDirectory from 'require-directory'
+import yargs from 'yargs/yargs'
 
 /**
  * CLI builder
  */
 class Builder {
+
+  private factory: any
+  private collections: any
+  private commands: any
+  private customCommands: any
+
   /** @constructor */
   constructor () {
-    this._factory = null
-    this._collections = null
-    this._commands = requireDirectory(module, path.join(__dirname, 'commands'))
-    this._customCommands = {}
+    this.factory = null
+    this.collections = null
+    this.commands = requireDirectory(module, path.join(__dirname, 'commands'))
+    this.customCommands = {}
   }
+  
 
   /**
    * Builds using collection factory
@@ -22,17 +28,16 @@ class Builder {
    * @param {Builder~Factory} factory Collection factory
    * @returns {Builder} This instance for chaining
    */
-  usingCollectionFactory (factory) {
-    check.assert.object(factory)
+  public usingCollectionFactory (factory: object): Builder {
 
-    if (this._factory) {
+    if (this.factory) {
       throw new Error('Already building using factory')
     }
-    if (this._collections) {
+    if (this.collections) {
       throw new Error('Already building using collections')
     }
 
-    this._factory = factory
+    this.factory = factory
 
     return this
   }
@@ -44,18 +49,16 @@ class Builder {
    * @param {Boolean} [recursive=true] Perform recursive search or no
    * @returns {Builder} This instance for chaining
    */
-  usingCollectionsFromDir (directory, recursive = true) {
-    check.assert.string(directory)
-    check.assert.boolean(recursive)
+  public usingCollectionsFromDir (directory: string, recursive: boolean = true): Builder {
 
-    if (this._factory) {
+    if (this.factory) {
       throw new Error('Already building using factory')
     }
 
     const collections = requireDirectory(module, directory, {
       recurse: recursive
     })
-    this._collections = Object.assign({}, this._collections, collections)
+    this.collections = Object.assign({}, this.collections, collections)
 
     return this
   }
@@ -66,10 +69,9 @@ class Builder {
    * @param {Builder~Command[]} commands
    * @returns {Builder} This instance for chaining
    */
-  usingCommands (commands) {
-    check.assert.array.of.object(commands)
+  public usingCommands (commands: object[]): Builder {
 
-    this._commands = Object.assign({}, this._commands, commands)
+    this.commands = Object.assign({}, this.commands, commands)
 
     return this
   }
@@ -81,14 +83,12 @@ class Builder {
    * @param {Boolean} [recursive=true] Perform recursive search or no
    * @returns {Builder} This instance for chaining
    */
-  usingCommandsFromDir (directory, recursive = true) {
-    check.assert.string(directory)
-    check.assert.boolean(recursive)
+  public usingCommandsFromDir (directory: string, recursive: boolean = true): Builder {
 
     const commands = requireDirectory(module, directory, {
       recurse: recursive
     })
-    this._commands = Object.assign({}, this._commands, commands)
+    this.commands = Object.assign({}, this.commands, commands)
 
     return this
   }
@@ -99,10 +99,9 @@ class Builder {
    * @param {Object[]} commands
    * @returns {Builder} This instance for chaining
    */
-  usingCustomCommands (commands) {
-    check.assert.array.of.object(commands)
+  public usingCustomCommands (commands: object[]): Builder {
 
-    this._customCommands = Object.assign({}, this._customCommands, commands)
+    this.customCommands = Object.assign({}, this.customCommands, commands)
 
     return this
   }
@@ -114,14 +113,12 @@ class Builder {
    * @param {Boolean} [recursive=true] Perform recursive search or no
    * @returns {Builder} This instance for chaining
    */
-  usingCustomCommandsFromDir (directory, recursive = true) {
-    check.assert.string(directory)
-    check.assert.boolean(recursive)
+  public usingCustomCommandsFromDir (directory: string, recursive: boolean = true): Builder {
 
     const commands = requireDirectory(module, directory, {
       recurse: recursive
     })
-    this._customCommands = Object.assign({}, this._customCommands, commands)
+    this.customCommands = Object.assign({}, this.customCommands, commands)
 
     return this
   }
@@ -132,8 +129,7 @@ class Builder {
    * @param {Object} [yargsInstance=undefined] Instance of yargs
    * @return {Object} Instance of yargs
    */
-  toYargs (yargsInstance = undefined) {
-    check.assert.maybe.object(yargsInstance)
+  public toYargs (yargsInstance: any = undefined): any {
 
     if (!yargsInstance) {
       yargsInstance = yargs()
@@ -144,14 +140,14 @@ class Builder {
       .wrap(Math.min(120, yargsInstance.terminalWidth()))
       .usage('Usage: $0 <command>')
 
-    _.values(this._commands).forEach(command => {
-      command = this._commandToYargs(command)
+    _.values(this.commands).forEach((command: any) => {
+      command = this.commandToYargs(command)
       if (command) {
         yargsInstance = yargsInstance.command(command)
       }
     })
 
-    _.values(this._customCommands).forEach(command => {
+    _.values(this.customCommands).forEach(command => {
       yargsInstance = yargsInstance.command(command)
     })
 
@@ -174,8 +170,7 @@ class Builder {
    * @param {string[]} [args=undefined] Arguments
    * @return {Object} Parsed arguments
    */
-  parse (args = undefined) {
-    check.assert.maybe.array.of.string(args)
+  public parse (args: any = undefined): object {
 
     if (!args) {
       args = process.argv.slice(2)
@@ -192,13 +187,13 @@ class Builder {
    * @param {string[]} [args=undefined] Arguments
    * @return {Object} Parsed arguments
    */
-  process (args = undefined) {
+  public process (args: any = undefined): object {
     if (process.platform === 'win32') {
       require('readline').createInterface({
         input: process.stdin,
         output: process.stdout
       }).on('SIGINT', function () {
-        process.emit('SIGINT')
+        (process as any).emit('SIGINT')
       })
     }
 
@@ -211,30 +206,30 @@ class Builder {
    * @param {Builder~Command} declaration Command declaration
    * @returns {Object} Yargs command
    */
-  _commandToYargs (declaration) {
-    let cli = {}
+  private commandToYargs (declaration: any): object | void {
+    let cli: any = {}
 
     let prerequisitesMet = true
-    if (declaration.prerequisites && this._collections) {
-      prerequisitesMet = _.some(_.values(this._collections), (collection) => declaration.prerequisites(collection))
-    } else if (declaration.prerequisites && this._factory) {
-      prerequisitesMet = declaration.prerequisites(this._factory.genericCollection)
+    if (declaration.prerequisites && this.collections) {
+      prerequisitesMet = _.some(_.values(this.collections), (collection) => declaration.prerequisites(collection))
+    } else if (declaration.prerequisites && this.factory) {
+      prerequisitesMet = declaration.prerequisites(this.factory.genericCollection)
     }
     if (!prerequisitesMet) {
       return
     }
 
     cli.command = declaration.command
-    if (this._factory) {
+    if (this.factory) {
       cli.command += ' <collection>'
     }
     cli.describe = declaration.description
-    cli.builder = (yargs) => {
+    cli.builder = (yargs: any): any => {
       yargs = yargs
           .usage(`Usage: $0 ${declaration.command} <collection> [options]`)
 
-      if (this._collections) {
-        _.values(this._collections).forEach(collection => {
+      if (this.collections) {
+        _.values(this.collections).forEach((collection: any) => {
           if (declaration.prerequisites && !declaration.prerequisites(collection)) {
             return
           }
@@ -242,9 +237,9 @@ class Builder {
           let collectionCmd = {
             command: collection.name,
             describe: `Collection (from "${collection.origin}")`,
-            builder: (yargs) => declaration.builder(yargs, collection)
+            builder: (yargs: any): any => declaration.builder(yargs, collection)
                 .usage(`Usage: $0 ${declaration.command} ${collection.name} [options]`),
-            handler: (argv) => {
+            handler: (argv: any): any => {
               return declaration.handler(argv, collection)
             }
           }
@@ -255,8 +250,8 @@ class Builder {
 
         yargs = yargs
             .demandCommand(1, 1, 'Please specify a collection')
-      } else if (this._factory) {
-        yargs = declaration.builder(yargs, this._factory.genericCollection)
+      } else if (this.factory) {
+        yargs = declaration.builder(yargs, this.factory.genericCollection)
             .positional('collection', {
               describe: 'Collection name',
               type: 'string'
@@ -268,9 +263,9 @@ class Builder {
 
       return yargs
     }
-    if (this._factory) {
-      cli.handler = (argv) => {
-        const collection = this._factory.createCollection(argv.collection)
+    if (this.factory) {
+      cli.handler = (argv: any): any => {
+        const collection = this.factory.createCollection(argv.collection)
         return declaration.handler(argv, collection)
       }
     }
@@ -283,4 +278,4 @@ class Builder {
  * @typedef {Object} Builder~Command
  */
 
-module.exports = Builder
+export default Builder

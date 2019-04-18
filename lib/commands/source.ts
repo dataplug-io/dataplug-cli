@@ -1,22 +1,25 @@
-const _ = require('lodash')
-const chalk = require('chalk')
-const logger = require('winston')
-const { JsonStreamWriter } = require('@dataplug/dataplug-json')
-const Progress = require('../progress')
-const configDeclarationToYargs = require('../configDeclarationToYargs')
+import _ from 'lodash'
+import chalk from 'chalk'
+import logger from 'winston'
+import { JsonStreamWriter } from '@dataplug/dataplug-json'
+import Progress from '../progress'
+import configDeclarationToYargs from '../configDeclarationToYargs'
 
 let declaration = {
   command: 'source',
-  description: 'Streams collection data to stdout'
+  description: 'Streams collection data to stdout',
+  builder: null,
+  prerequisites: null,
+  handler: null
 }
-declaration.builder = (yargs, collection) => {
+declaration.builder = (yargs: any, collection: any): any => {
   yargs = yargs
     .option('indent', {
       alias: 'i',
       describe: 'Prettify output JSON using given amount of spaces',
       type: 'integer'
     })
-    .coerce('indent', value => {
+    .coerce('indent', (value: any) => {
       value = Number.parseInt(value)
       return _.isNaN(value) ? undefined : value
     })
@@ -37,12 +40,12 @@ declaration.builder = (yargs, collection) => {
 
   return yargs
 }
-declaration.prerequisites = (collection) => {
+declaration.prerequisites = (collection: any) : any => {
   return collection.source
 }
-declaration.handler = (argv, collection) => {
-  const progress = !argv.progress ? null : new Progress({
-    supplied: (value) => chalk.green('↑') + ` supplied: ${value}`
+declaration.handler = (argv: any, collection: any): void => {
+  const progress: any = !argv.progress ? null : new Progress({
+    supplied: (value: any): any => chalk.green('↑') + ` supplied: ${value}`
   })
   if (progress) {
     progress.start()
@@ -54,7 +57,7 @@ declaration.handler = (argv, collection) => {
   }
 
   collection.source.createOutput(argv)
-    .then((sourceStreams) => new Promise((resolve, reject) => {
+    .then((sourceStreams: any): Promise<any> => new Promise((resolve, reject) => {
       sourceStreams = [].concat(sourceStreams)
 
       process.on('SIGINT', function () {
@@ -66,9 +69,9 @@ declaration.handler = (argv, collection) => {
         })
       })
 
-      _.forEach(sourceStreams, (sourceStream, index) => {
+      _.forEach(sourceStreams, (sourceStream: NodeJS.ReadStream, index: number) => {
         sourceStream
-          .on('error', (error) => {
+          .on('error', (error: Error) => {
             logger.log('error', 'Error while obtaining data:', error)
             reject(error)
           })
@@ -79,14 +82,14 @@ declaration.handler = (argv, collection) => {
         }
       })
 
-      _.last(sourceStreams)
+      (_.last(sourceStreams) as any)
         .on('data', () => {
           if (progress) {
             progress.supplied += 1
           }
         })
         .pipe(writer)
-        .on('error', (error) => {
+        .on('error', (error: Error) => {
           logger.log('error', 'Error while transforming data:', error)
           reject(error)
         })
@@ -94,7 +97,7 @@ declaration.handler = (argv, collection) => {
           writer.unpipe()
         })
         .pipe(process.stdout)
-        .on('error', (error) => {
+        .on('error', (error: Error) => {
           logger.log('error', 'Error while writing data to stdout:', error)
           reject(error)
         })
@@ -107,7 +110,7 @@ declaration.handler = (argv, collection) => {
         progress.cancel()
       }
     })
-    .catch((error) => {
+    .catch((error: Error) => {
       if (progress) {
         progress.cancel()
       }
@@ -116,4 +119,4 @@ declaration.handler = (argv, collection) => {
     })
 }
 
-module.exports = declaration
+export default declaration
