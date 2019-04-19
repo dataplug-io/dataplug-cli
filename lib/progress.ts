@@ -6,9 +6,9 @@ import readline from 'readline'
  */
 export default class Progress {
 
-  private _formatters: any//object
-  private _stream: any//NodeJS.WriteStream | undefined
-  private _timer: any//NodeJS.Timeout | null
+  private _formatters: object
+  private _stream: NodeJS.WritableStream
+  private _timer: NodeJS.Timeout | null
   private _metricsPrinted: number
 
   /**
@@ -16,7 +16,7 @@ export default class Progress {
    * @param {Object} [formatters=undefined] Formatters object
    * @param {Writeable} [stream=undefined] Stream to write process to, defaults to stderr
    */
-  constructor (formatters: any = undefined, stream: any/*NodeJS.WriteStream | undefined*/ = undefined) {
+  constructor (formatters: object | undefined = undefined, stream: NodeJS.WriteStream = process.stderr) {
     this._formatters = formatters ? _.cloneDeep(formatters) : {}
     this._stream = stream || process.stderr
     this._timer = null
@@ -51,7 +51,7 @@ export default class Progress {
         return
       }
 
-      const formatter = this._formatters[metric] || ((value: any) => `${metric} = ` + _.toString(value))
+      const formatter = this._formatters[metric] || ((value: any): string => `${metric} = ` + _.toString(value))
 
       readline.clearLine(this._stream, 0)
       this._stream.write(formatter(_.isNil(value) ? 0 : value) + '\n')

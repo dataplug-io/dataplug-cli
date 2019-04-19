@@ -31,12 +31,12 @@ declaration.builder = (yargs: any, collection: any): any => {
 
   return yargs
 }
-declaration.prerequisites = (collection: any): any => {
+declaration.prerequisites = (collection: any): object| boolean => {
   return collection.target
 }
 declaration.handler = (argv: any, collection: any): void => {
   const progress: any = !argv.progress ? null : new Progress({
-    consumed: (value: any): any => chalk.green('↑') + ` consumed: ${value}`
+    consumed: (value: any): string => chalk.green('↑') + ` consumed: ${value}`
   })
   if (progress) {
     progress.start()

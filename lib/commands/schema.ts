@@ -19,14 +19,14 @@ declaration.builder = (yargs: any): any => yargs
     describe: 'Prettify output JSON using given amount of spaces',
     type: 'integer'
   })
-  .coerce('indent', (value: any): any => {
-    value = Number.parseInt(value)
-    return _.isNaN(value) ? undefined : value
+  .coerce('indent', (value: string): number | undefined => {
+    const parsedValue = Number.parseInt(value)
+    return _.isNaN(parsedValue) ? undefined : parsedValue
   })
   .option('flat', {
     describe: 'Flatten schema'
   })
-declaration.prerequisites = (collection: any): any => {
+declaration.prerequisites = (collection: any): object| boolean => {
   return collection.schema
 }
 declaration.handler = (argv: any, collection: any): void => {

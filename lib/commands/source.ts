@@ -19,9 +19,9 @@ declaration.builder = (yargs: any, collection: any): any => {
       describe: 'Prettify output JSON using given amount of spaces',
       type: 'integer'
     })
-    .coerce('indent', (value: any) => {
-      value = Number.parseInt(value)
-      return _.isNaN(value) ? undefined : value
+    .coerce('indent', (value: string): number | undefined => {
+      const parsedValue = Number.parseInt(value)
+      return _.isNaN(parsedValue) ? undefined : parsedValue
     })
     .option('progress', {
       alias: 'p',
@@ -40,12 +40,12 @@ declaration.builder = (yargs: any, collection: any): any => {
 
   return yargs
 }
-declaration.prerequisites = (collection: any) : any => {
+declaration.prerequisites = (collection: any) : object| boolean => {
   return collection.source
 }
 declaration.handler = (argv: any, collection: any): void => {
   const progress: any = !argv.progress ? null : new Progress({
-    supplied: (value: any): any => chalk.green('↑') + ` supplied: ${value}`
+    supplied: (value: any): string => chalk.green('↑') + ` supplied: ${value}`
   })
   if (progress) {
     progress.start()

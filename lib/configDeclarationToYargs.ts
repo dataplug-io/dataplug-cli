@@ -4,7 +4,7 @@ import moment from 'moment'
 /**
  * Validates parameter value
  */
-function validateParameterValue (parameter: any, type: 'string' | 'number' | 'integer', format: 'date-time' | 'date', value: any) {
+function validateParameterValue (parameter: string, type: 'string' | 'number' | 'integer', format: 'date-time' | 'date', value: any): any {
   if (type === 'integer') {
     const parsedValue = Number.parseInt(value)
     if (_.isNaN(parsedValue)) {
@@ -32,7 +32,7 @@ function validateParameterValue (parameter: any, type: 'string' | 'number' | 'in
 /**
  * Converts parameter declaration to yargs
  */
-function parameterDeclarationToYargs (yargs: any, parameter: any, declaration: any): void {
+function parameterDeclarationToYargs (yargs: any, parameter: string, declaration: any): void {
   const optionName = _.kebabCase(parameter)
 
   let option: any = {}
