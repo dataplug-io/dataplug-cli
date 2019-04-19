@@ -1,10 +1,10 @@
-const _ = require('lodash')
-const moment = require('moment')
+import _ from 'lodash'
+import moment from 'moment'
 
 /**
  * Validates parameter value
  */
-function validateParameterValue (parameter, type, format, value) {
+function validateParameterValue (parameter: string, type: 'string' | 'number' | 'integer', format: 'date-time' | 'date', value: any): any {
   if (type === 'integer') {
     const parsedValue = Number.parseInt(value)
     if (_.isNaN(parsedValue)) {
@@ -32,10 +32,10 @@ function validateParameterValue (parameter, type, format, value) {
 /**
  * Converts parameter declaration to yargs
  */
-function parameterDeclarationToYargs (yargs, parameter, declaration) {
+function parameterDeclarationToYargs (yargs: any, parameter: string, declaration: any): void {
   const optionName = _.kebabCase(parameter)
 
-  let option = {}
+  let option: any = {}
   if (declaration.description) {
     option.describe = declaration.description
   }
@@ -60,7 +60,7 @@ function parameterDeclarationToYargs (yargs, parameter, declaration) {
   }
   yargs.option(optionName, option)
 
-  yargs.coerce(optionName, (value) => {
+  yargs.coerce(optionName, (value: any): any => {
     if (declaration.type === 'array') {
       return _.map(value, (value) => {
         return validateParameterValue(`${optionName}[]`, declaration.item, declaration.format, value)
@@ -76,11 +76,11 @@ function parameterDeclarationToYargs (yargs, parameter, declaration) {
  *
  * @param {ConfigDeclaration} configDeclaration
  */
-function configDeclarationToYargs (yargs, configDeclaration) {
-  _.forOwn(configDeclaration, (parameter, parameterName) => {
+function configDeclarationToYargs (yargs: any, configDeclaration: any): any {
+  _.forOwn(configDeclaration, (parameter: any, parameterName: any) => {
     parameterDeclarationToYargs(yargs, parameterName, parameter)
   })
   return yargs
 }
 
-module.exports = configDeclarationToYargs
+export default configDeclarationToYargs

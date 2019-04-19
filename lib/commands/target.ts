@@ -1,15 +1,18 @@
-const _ = require('lodash')
-const chalk = require('chalk')
-const logger = require('winston')
-const { JsonStreamReader } = require('@dataplug/dataplug-json')
-const Progress = require('../progress')
-const configDeclarationToYargs = require('../configDeclarationToYargs')
+import _ from 'lodash'
+import chalk from 'chalk'
+import logger from 'winston'
+import { JsonStreamReader } from '@dataplug/dataplug-json'
+import Progress from '../progress';
+import configDeclarationToYargs from '../configDeclarationToYargs'
 
 let declaration = {
   command: 'target',
-  description: `Streams data from stdin to collection`
+  description: `Streams data from stdin to collection`,
+  builder: null,
+  prerequisites: null,
+  handler: null
 }
-declaration.builder = (yargs, collection) => {
+declaration.builder = (yargs: any, collection: any): any => {
   yargs = yargs
     .option('progress', {
       alias: 'p',
@@ -28,12 +31,12 @@ declaration.builder = (yargs, collection) => {
 
   return yargs
 }
-declaration.prerequisites = (collection) => {
+declaration.prerequisites = (collection: any): object| boolean => {
   return collection.target
 }
-declaration.handler = (argv, collection) => {
-  const progress = !argv.progress ? null : new Progress({
-    consumed: (value) => chalk.green('↑') + ` consumed: ${value}`
+declaration.handler = (argv: any, collection: any): void => {
+  const progress: any = !argv.progress ? null : new Progress({
+    consumed: (value: any): string => chalk.green('↑') + ` consumed: ${value}`
   })
   if (progress) {
     progress.start()
@@ -45,10 +48,10 @@ declaration.handler = (argv, collection) => {
   }
 
   collection.target.createInput(argv)
-    .then((targetStreams) => new Promise((resolve, reject) => {
-      _.forEach(targetStreams, (targetStream, index) => {
+    .then((targetStreams: any): Promise<any> => new Promise((resolve: any, reject: any) => {
+      _.forEach(targetStreams, (targetStream: NodeJS.ReadStream, index: number) => {
         targetStream
-          .on('error', (error) => {
+          .on('error', (error: Error) => {
             logger.log('error', 'Error while submitting data:', error)
             reject(error)
           })
@@ -59,18 +62,18 @@ declaration.handler = (argv, collection) => {
         }
       })
 
-      _.last(targetStreams)
-        .on('finish', () => {
+      (_.last(targetStreams) as any)
+        .on('close', () => {
           resolve()
         })
 
       process.stdin
-        .on('error', (error) => {
+        .on('error', (error: Error) => {
           logger.log('error', 'Error while reading data from stdin:', error)
           reject(error)
         })
         .pipe(reader)
-        .on('error', (error) => {
+        .on('error', (error: Error) => {
           logger.log('error', 'Error while deserializing data as JSON:', error)
           reject(error)
         })
@@ -86,7 +89,7 @@ declaration.handler = (argv, collection) => {
         progress.cancel()
       }
     })
-    .catch((error) => {
+    .catch((error: Error) => {
       if (progress) {
         progress.cancel()
       }
@@ -95,4 +98,4 @@ declaration.handler = (argv, collection) => {
     })
 }
 
-module.exports = declaration
+export default declaration

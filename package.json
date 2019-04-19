@@ -2,21 +2,27 @@
   "name": "@dataplug/dataplug-cli",
   "version": "0.55.0",
   "description": "Dataplug CLI library (by Dataplug.io)",
-  "main": "lib/index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "bin": {
-    "dataplug-cli": "bin/cli.js"
+    "dataplug-cli": "dist/bin/cli.js"
   },
   "scripts": {
     "jsdoc": "jsdoc --destination ./docs --recurse ./lib --verbose",
-    "lint": "standard",
-    "test": "nyc --reporter=none mocha",
-    "coverage": "nyc report --reporter=html --reporter=text",
-    "coveralls": "nyc report --reporter=text-lcov | coveralls",
+    "prepublishOnly": "npm run preversion && npm run prepare:production",
+    "postpublish": "rimraf dist",
+    "prepare:production": "rimraf dist && tsc",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "docs": "typedoc --out ./docs ./src",
+    "lint": "tslint -p tsconfig.json -c tslint.json",
+    "test": "jest",
+    "coverage": "jest --coverage",
+    "coveralls": "jest --coverage && cat ./tests/coverage/lcov.info | coveralls",
     "preversion": "npm run lint && npm run test",
     "postversion": "git push && git push --tags"
   },
   "engines": {
-    "node": "8.x"
+    "node": ">=8.x"
   },
   "repository": {
     "type": "git",
@@ -27,28 +33,53 @@
   "bugs": {
     "url": "https://github.com/dataplug-io/dataplug-cli/issues"
   },
+  "jest": {
+    "collectCoverage": true,
+    "collectDirectory": "./tests/coverage/lcov.info"
+  },
   "homepage": "https://github.com/dataplug-io/dataplug-cli#readme",
   "dependencies": {
-    "@dataplug/dataplug": "^0.46.0",
+    "@dataplug/dataplug": "^0.49.0",
     "@dataplug/dataplug-flatters": "^0.16.0",
     "@dataplug/dataplug-json": "^0.11.0",
-    "ajv": "^5.4.0",
-    "bluebird": "^3.5.1",
-    "chalk": "^2.3.0",
-    "check-types": "^7.3.0",
-    "lodash": "^4.17.4",
-    "moment": "^2.19.2",
+    "ajv": "^5.5.2",
+    "bluebird": "^3.5.3",
+    "chalk": "^2.4.2",
+    "lodash": "^4.17.11",
+    "moment": "^2.24.0",
     "require-directory": "^2.1.1",
-    "winston": "^2.4.0",
-    "yargs": "^10.0.3"
+    "winston": "^2.4.4",
+    "yargs": "^10.1.2"
   },
   "devDependencies": {
-    "chai": "^4.1.2",
+    "@types/ajv": "^1.0.0",
+    "@types/bluebird": "^3.5.24",
+    "@types/chai": "^4.1.7",
+    "@types/chai-as-promised": "^7.1.0",
+    "@types/jest": "^24.0.11",
+    "@types/json-schema": "^7.0.1",
+    "@types/lodash": "^4.14.118",
+    "@types/mocha": "^5.2.5",
+    "@types/node": "^10.12.9",
+    "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
-    "coveralls": "^3.0.0",
+    "coveralls": "^3.0.2",
+    "jest": "^24.7.1",
     "jsdoc": "^3.5.5",
-    "mocha": "^4.0.1",
-    "nyc": "^11.2.1",
-    "standard": "^10.0.3"
+    "mocha": "^4.1.0",
+    "nyc": "^13.1.0",
+    "prettier": "^1.15.2",
+    "rimraf": "^2.6.3",
+    "standard": "^10.0.3",
+    "ts-jest": "^24.0.2",
+    "ts-loader": "^4.4.2",
+    "ts-node": "^7.0.1",
+    "tsconfig-paths": "^3.5.0",
+    "tslint": "5.11.0",
+    "tslint-config-prettier": "^1.17.0",
+    "tslint-config-standard": "^8.0.1",
+    "tslint-plugin-prettier": "^2.0.1",
+    "typedoc": "^0.14.2",
+    "typescript": "^3.4.4"
   }
 }

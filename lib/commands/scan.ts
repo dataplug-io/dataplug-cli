@@ -1,25 +1,28 @@
-const _ = require('lodash')
-const Ajv = require('ajv')
-const chalk = require('chalk')
-const Promise = require('bluebird')
-const logger = require('winston')
-const { Scanner } = require('@dataplug/dataplug')
-const { JsonStreamReader } = require('@dataplug/dataplug-json')
-const Progress = require('../progress')
+import _ from 'lodash'
+import Ajv from 'ajv'
+import chalk from 'chalk'
+import Promise from 'bluebird'
+import logger from 'winston'
+import { Scanner } from '@dataplug/dataplug'
+import { JsonStreamReader } from '@dataplug/dataplug-json'
+import Progress from '../progress'
 
 let declaration = {
   command: 'scan',
-  description: 'Scans collection data stream from stdin and output results'
+  description: 'Scans collection data stream from stdin and output results',
+  builder: null,
+  prerequisites: null,
+  handler: null
 }
-declaration.builder = (yargs) => yargs
+declaration.builder = (yargs: any): any => yargs
   .option('indent', {
     alias: 'i',
     describe: 'Prettify output JSON using given amount of spaces',
     type: 'integer'
   })
-  .coerce('indent', value => {
-    value = Number.parseInt(value)
-    return _.isNaN(value) ? undefined : value
+  .coerce('indent', (value: string): number | undefined => {
+    const parsedValue = Number.parseInt(value)
+    return _.isNaN(parsedValue) ? undefined : parsedValue
   })
   .option('results', {
     alias: 'o',
@@ -39,18 +42,18 @@ declaration.builder = (yargs) => yargs
     alias: 'f',
     describe: 'Fail on invalid data with non-zero exit code'
   })
-declaration.prerequisites = (collection) => {
+declaration.prerequisites = (collection: any): object| boolean => {
   return collection.schema
 }
-declaration.handler = (argv, collection) => {
+declaration.handler = (argv: any, collection: any): void => {
   const validator = new Ajv({
     useDefaults: true,
     allErrors: false
   }).compile(collection.schema)
-  const progress = !argv.progress && !argv.results ? null : new Progress({
-    scanned: (value) => chalk.yellow('?') + ` scanned: ${value}`,
-    valid: (value) => chalk.green('✓') + ` valid: ${value}`,
-    invalid: (value) => chalk.red('✗') + ` invalid: ${value}`
+  const progress: any = !argv.progress && !argv.results ? null : new Progress({
+    scanned: (value: any): string => chalk.yellow('?') + ` scanned: ${value}`,
+    valid: (value: any): string => chalk.green('✓') + ` valid: ${value}`,
+    invalid: (value: any): string => chalk.red('✗') + ` invalid: ${value}`
   })
   if (progress) {
     progress.scanned =
@@ -62,7 +65,7 @@ declaration.handler = (argv, collection) => {
   }
 
   const reader = new JsonStreamReader()
-  const scanner = new Scanner((data) => {
+  const scanner = new Scanner((data: any) => {
     let result = validator(data)
     if (argv.invert) {
       result = !result
@@ -86,19 +89,19 @@ declaration.handler = (argv, collection) => {
     }
   }, true)
 
-  new Promise((resolve, reject) => {
+  new Promise((resolve: any, reject: any) => {
     process.stdin
-      .on('error', (error) => {
+      .on('error', (error: Error) => {
         logger.log('error', 'Error while reading data from stdin:', error)
         reject(error)
       })
       .pipe(reader)
-      .on('error', (error) => {
+      .on('error', (error: Error) => {
         logger.log('error', 'Error while deserializing data as JSON:', error)
         reject(error)
       })
       .pipe(scanner)
-      .on('error', (error) => {
+      .on('error', (error: Error) => {
         logger.log('error', 'Error while scanning data:', error)
         reject(error)
       })
@@ -118,7 +121,7 @@ declaration.handler = (argv, collection) => {
         process.stdout.write(JSON.stringify(results, null, space))
       }
     })
-    .catch((error) => {
+    .catch((error: Error) => {
       if (progress) {
         progress.cancel()
       }
@@ -127,4 +130,4 @@ declaration.handler = (argv, collection) => {
     })
 }
 
-module.exports = declaration
+export default declaration

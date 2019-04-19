@@ -1,11 +1,14 @@
-const _ = require('lodash')
-const { SchemaFlatter } = require('@dataplug/dataplug-flatters')
+import _ from 'lodash'
+import { SchemaFlatter } from '@dataplug/dataplug-flatters'
 
 let declaration = {
   command: 'schema',
-  description: 'Prints collection schema to stdout'
+  description: 'Prints collection schema to stdout',
+  builder: null,
+  prerequisites: null,
+  handler: null
 }
-declaration.builder = (yargs) => yargs
+declaration.builder = (yargs: any): any => yargs
   .option('name', {
     alias: 'n',
     describe: 'Name of collection to use instead of default',
@@ -16,17 +19,17 @@ declaration.builder = (yargs) => yargs
     describe: 'Prettify output JSON using given amount of spaces',
     type: 'integer'
   })
-  .coerce('indent', value => {
-    value = Number.parseInt(value)
-    return _.isNaN(value) ? undefined : value
+  .coerce('indent', (value: string): number | undefined => {
+    const parsedValue = Number.parseInt(value)
+    return _.isNaN(parsedValue) ? undefined : parsedValue
   })
   .option('flat', {
     describe: 'Flatten schema'
   })
-declaration.prerequisites = (collection) => {
+declaration.prerequisites = (collection: any): object| boolean => {
   return collection.schema
 }
-declaration.handler = (argv, collection) => {
+declaration.handler = (argv: any, collection: any): void => {
   let schema = collection.schema
   if (argv.flat) {
     schema = new SchemaFlatter().flattenToJsonSchema(schema, argv.name || collection.name)
@@ -36,4 +39,4 @@ declaration.handler = (argv, collection) => {
   process.stdout.write(JSON.stringify(schema, null, indent))
 }
 
-module.exports = declaration
+export default declaration

@@ -1,16 +1,22 @@
-const _ = require('lodash')
-const readline = require('readline')
+import _ from 'lodash'
+import readline from 'readline'
 
 /**
  * Helper class for keeping track of the progress and printing it
  */
-class Progress {
+export default class Progress {
+
+  private _formatters: object
+  private _stream: NodeJS.WritableStream
+  private _timer: NodeJS.Timeout | null
+  private _metricsPrinted: number
+
   /**
    * @constructor
    * @param {Object} [formatters=undefined] Formatters object
    * @param {Writeable} [stream=undefined] Stream to write process to, defaults to stderr
    */
-  constructor (formatters = undefined, stream = undefined) {
+  constructor (formatters: object | undefined = undefined, stream: NodeJS.WriteStream = process.stderr) {
     this._formatters = formatters ? _.cloneDeep(formatters) : {}
     this._stream = stream || process.stderr
     this._timer = null
@@ -23,29 +29,29 @@ class Progress {
    * @param {string} key Metric key
    * @return {boolean} True if key identifies a metric
    */
-  isMetric (key) {
-    return key && key.length > 1 && key.charAt(0) !== '_' && this.hasOwnProperty(key)
+  public isMetric (key: string): boolean {
+    return key.length > 1 && key.charAt(0) !== '_' && this.hasOwnProperty(key)
   }
 
   /**
    * Gets metrics
    * @return {Object} Object with metrics
    */
-  getMetrics () {
-    return _.pickBy(this, (value, key) => this.isMetric(key))
+  public getMetrics (): any {
+    return _.pickBy(this, (value: any, key: string) => this.isMetric(key))
   }
 
   /**
    * Prints current status
    */
-  print () {
+  public print (): void {
     this._metricsPrinted = 0
-    _.forOwn(this, (value, metric) => {
+    _.forOwn(this, (value: any, metric: string): void => {
       if (!this.isMetric(metric)) {
         return
       }
 
-      const formatter = this._formatters[metric] || ((value) => `${metric} = ` + _.toString(value))
+      const formatter = this._formatters[metric] || ((value: any): string => `${metric} = ` + _.toString(value))
 
       readline.clearLine(this._stream, 0)
       this._stream.write(formatter(_.isNil(value) ? 0 : value) + '\n')
@@ -56,8 +62,8 @@ class Progress {
   /**
    * Iterative print
    */
-  _iterativePrint () {
-    readline.cursorTo(this._stream, 0, null)
+  private iterativePrint (): void {
+    (readline as any).cursorTo(this._stream, 0, null)
     readline.moveCursor(this._stream, 0, -this._metricsPrinted)
     this.print()
   }
@@ -65,25 +71,23 @@ class Progress {
   /**
    * Starts printing by timer
    */
-  start (interval = 10) {
+  public start (interval: number = 10): void {
     if (this._timer !== null) {
       return
     }
     this.print()
-    this._timer = setInterval(() => this._iterativePrint(), interval)
+    this._timer = setInterval(() => this.iterativePrint(), interval)
   }
 
   /**
    * Cancel printing by timer
    */
-  cancel () {
+  public cancel (): void {
     if (this._timer === null) {
       return
     }
     clearInterval(this._timer)
     this._timer = null
-    this._iterativePrint()
+    this.iterativePrint()
   }
-};
-
-module.exports = Progress
+}
